@@ -1,2 +1,2 @@
 # reactive-drop-watchdog
-Watchdog service for Reactive Drop
+Alien Swarm: Reactive Drop Anticheat auto updater

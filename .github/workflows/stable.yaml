@@ -1,0 +1,40 @@
+name: Continuous integration
+on:
+  push:
+    branches:
+      - master
+  repository_dispatch:
+    types: [build_stable]
+
+jobs:
+  build:
+    name: build release
+    runs-on: windows-2019
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.CR_PAT }}
+          submodules: true
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.3
+      - name: Build release
+        run: |
+          MSBuild.exe watchdog.vcxproj -property:Configuration=Release
+      # - name: Sign release
+      #   run: |
+      #     & 'C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe' `
+      #       sign /f .\certs\anticheat-cert.pfx /p "${{ secrets.CERT_PASSWD }}" `
+      #       /tr http://timestamp.digicert.com /td sha1 /fd sha1 Release/watchdog.dll
+      - name: Store release
+        uses: actions/upload-artifact@v2
+        with:
+          name: rd-watchdog
+          path: Release/watchdog.dll
+      - name: VirusTotal Scan
+        uses: crazy-max/ghaction-virustotal@v2
+        with:
+          update_release_body: false
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            Release/watchdog.dll

@@ -1,0 +1,8 @@
+.vs
+*.user
+Debug
+Release
+depots
+addons/*.dll
+addons/*.zip
+bin/sign.cmd
